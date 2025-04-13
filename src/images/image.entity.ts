@@ -11,6 +11,9 @@ export class Image {
   @Column()
   path: string;
 
+  @Column()
+  url: string;
+
   @Column({ nullable: true })
   description?: string;
 }
