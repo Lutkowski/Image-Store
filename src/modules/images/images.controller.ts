@@ -11,13 +11,17 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { ImagesService } from './images.service';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
 import { CreateImageDto } from './dto/create-image.dto';
-import { extname } from 'path';
-import * as fs from 'fs';
-import { ApiBody, ApiConsumes, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { Image } from './image.entity';
+import {
+  ApiBody,
+  ApiConsumes,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
+import { Image } from '../../common/entities/image.entity';
+import { UploadFileInterceptor } from '../../common/interceptors/upload-file.interceptor';
 
 @ApiTags('images')
 @Controller('images')
@@ -49,25 +53,7 @@ export class ImagesController {
     description: 'Изображение успешно загружено',
     type: Image,
   })
-  @UseInterceptors(
-    FileInterceptor('file', {
-      storage: diskStorage({
-        destination: (req, file, callback) => {
-          const uploadFolder = './uploads';
-          if (!fs.existsSync(uploadFolder)) {
-            fs.mkdirSync(uploadFolder, { recursive: true });
-          }
-          callback(null, uploadFolder);
-        },
-        filename: (req, file, callback) => {
-          const timestamp = Date.now();
-          const randomNumber = Math.round(Math.random() * 1e9);
-          const ext = extname(file.originalname);
-          callback(null, `file${timestamp}and${randomNumber}${ext}`);
-        },
-      }),
-    }),
-  )
+  @UseInterceptors(UploadFileInterceptor)
   async uploadImage(
     @UploadedFile() file: Express.Multer.File,
     @Body() createImageDto: CreateImageDto,

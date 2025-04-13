@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
-import { ImagesModule } from './images/images.module';
+import { ImagesModule } from './modules/images/images.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { databaseConfig } from './common/configs/database.config';
 
 @Module({
   imports: [
@@ -13,16 +14,7 @@ import { join } from 'path';
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        type: 'postgres',
-        host: configService.get<string>('POSTGRES_HOST'),
-        port: parseInt(configService.get<string>('POSTGRES_PORT'), 10),
-        username: configService.get<string>('POSTGRES_USER'),
-        password: configService.get<string>('POSTGRES_PASSWORD'),
-        database: configService.get<string>('POSTGRES_DB'),
-        autoLoadEntities: true,
-        synchronize: true,
-      }),
+      useFactory: (configService: ConfigService) => databaseConfig(configService),
       inject: [ConfigService],
     }),
     ServeStaticModule.forRoot({

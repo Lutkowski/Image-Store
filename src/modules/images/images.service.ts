@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Image } from './image.entity';
+import { Image} from '../../common/entities/image.entity';
 import { CreateImageDto } from './dto/create-image.dto';
 import { ConfigService } from '@nestjs/config';
 
