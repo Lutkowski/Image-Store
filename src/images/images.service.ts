@@ -3,21 +3,29 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Image } from './image.entity';
 import { CreateImageDto } from './dto/create-image.dto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class ImagesService {
   constructor(
     @InjectRepository(Image)
     private imagesRepository: Repository<Image>,
+    private configService: ConfigService,
   ) {}
 
   async create(
     file: Express.Multer.File,
     createImageDto: CreateImageDto,
   ): Promise<Image> {
+    const normalizedPath = file.path.replace(/\\/g, '/').replace(/^\.\//, '');
+    const baseUrl =
+      this.configService.get<string>('APP_URL') || 'http://localhost:3000';
+    const url = `${baseUrl}/${normalizedPath}`;
+
     const image = this.imagesRepository.create({
       filename: file.filename,
-      path: file.path,
+      path: normalizedPath,
+      url,
       description: createImageDto.description,
     });
     return this.imagesRepository.save(image);

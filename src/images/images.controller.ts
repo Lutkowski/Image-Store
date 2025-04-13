@@ -3,7 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  NestInterceptor,
   Param,
   ParseIntPipe,
   Post,
@@ -34,13 +33,13 @@ export class ImagesController {
           callback(null, uploadFolder);
         },
         filename: (req, file, callback) => {
-          const uniqueSuffix =
-            Date.now() + '-' + Math.round(Math.random() * 1e9);
+          const timestamp = Date.now();
+          const randomNumber = Math.round(Math.random() * 1e9);
           const ext = extname(file.originalname);
-          callback(null, `${file.fieldname}-${uniqueSuffix}${ext}`);
+          callback(null, `file${timestamp}and${randomNumber}${ext}`);
         },
       }),
-    }) as NestInterceptor,
+    }),
   )
   async uploadImage(
     @UploadedFile() file: Express.Multer.File,
