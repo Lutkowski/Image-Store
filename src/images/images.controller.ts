@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  NestInterceptor,
   Param,
   ParseIntPipe,
   Post,
@@ -15,6 +16,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { CreateImageDto } from './dto/create-image.dto';
 import { extname } from 'path';
+import * as fs from 'fs';
 
 @Controller('images')
 export class ImagesController {
@@ -24,7 +26,13 @@ export class ImagesController {
   @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
-        destination: './uploads',
+        destination: (req, file, callback) => {
+          const uploadFolder = './uploads';
+          if (!fs.existsSync(uploadFolder)) {
+            fs.mkdirSync(uploadFolder, { recursive: true });
+          }
+          callback(null, uploadFolder);
+        },
         filename: (req, file, callback) => {
           const uniqueSuffix =
             Date.now() + '-' + Math.round(Math.random() * 1e9);
@@ -32,7 +40,7 @@ export class ImagesController {
           callback(null, `${file.fieldname}-${uniqueSuffix}${ext}`);
         },
       }),
-    }),
+    }) as NestInterceptor,
   )
   async uploadImage(
     @UploadedFile() file: Express.Multer.File,
