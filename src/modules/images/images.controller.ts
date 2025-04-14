@@ -4,9 +4,8 @@ import {
   Delete,
   Get,
   Param,
-  ParseIntPipe,
+  ParseIntPipe, Patch,
   Post,
-  Put,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
@@ -22,6 +21,7 @@ import {
 } from '@nestjs/swagger';
 import { Image } from '../../common/entities/image.entity';
 import { UploadFileInterceptor } from '../../common/interceptors/upload-file.interceptor';
+import { UpdateImageDto } from './dto/update-description.dto';
 
 @ApiTags('images')
 @Controller('images')
@@ -82,8 +82,12 @@ export class ImagesController {
     return this.imagesService.findOne(id);
   }
 
-  @Put(':id')
+  @Patch(':id')
   @ApiOperation({ summary: 'Обновить описание изображения по идентификатору' })
+  @ApiBody({
+    description: 'Объект для обновления описания.',
+    type: UpdateImageDto,
+  })
   @ApiOkResponse({
     description: 'Изображение успешно обновлено',
     type: Image,
@@ -91,7 +95,7 @@ export class ImagesController {
   @ApiNotFoundResponse({ description: 'Изображение не найдено' })
   async updateImage(
     @Param('id', ParseIntPipe) id: number,
-    @Body() updateData: Partial<{ description: string }>,
+    @Body() updateData: UpdateImageDto,
   ) {
     return this.imagesService.update(id, updateData);
   }
