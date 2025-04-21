@@ -1,4 +1,8 @@
-import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, Repository } from 'typeorm';
 import { Image } from '../../common/entities/image.entity';
@@ -14,8 +18,7 @@ export class ImagesService {
     @InjectRepository(Image)
     private imagesRepository: Repository<Image>,
     private configService: ConfigService,
-  ) {
-  }
+  ) {}
 
   async create(
     file: Express.Multer.File,
@@ -60,7 +63,9 @@ export class ImagesService {
     try {
       await fs.unlink(absoluteFilePath);
     } catch (error) {
-      throw new InternalServerErrorException(`Ошибка при удалении файла: ${error.message}`);
+      throw new InternalServerErrorException(
+        `Ошибка при удалении файла : ${error.message}`,
+      );
     }
 
     const result = await this.imagesRepository.delete(id);
@@ -69,5 +74,4 @@ export class ImagesService {
     }
     return result;
   }
-
 }
